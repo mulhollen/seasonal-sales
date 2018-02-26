@@ -1,64 +1,68 @@
-// productData = [];
-// categories = [];
+"use strict";
 
+let domDisplay = document.getElementById("container");
+let select = document.getElementById("select");
+let summer = document.getElementById("summer");
+let fall = document.getElementById("fall");
+let winter = document.getElementById("winter");
+let spring = document.getElementById("spring");
+let wrapper = `<section class="block-wrapper" style="border: 2px solid #000000;">`;
+let title;
+let price;
+let category;
 
-
-function dataComplete(event) {
-        // going down in this event (think what you'd see in console.log) looking at our event - then the target the specific thing - viewing the responseText
-        productData = JSON.parse(this.responseText);
-        
-        showItems(productData);
-        console.log("this product data", productData);
-        console.log("keys", Object.keys(productData));
-}
-
-function dataFailed(event) {
-    console.log("something went wrong");
-}
-
-let showItems = (data) => {
-    let productDisplay = document.getElementById("container");
-    let keys = Object.keys(data)
-    
-        for (var i = 0; i < productData.products.length; i++){
-            
-            let productBlock = buildInventory(i);
-            productDisplay.innerHTML += productBlock;
-
-        }
-    };
-
-let buildInventory = (num) => {
-    //building a string to create the visual display 
-        let block = "",
-            wrapper = `<section class="block-wrapper" style="border: 2px solid #000000;">`,
-            title = `<h3>Name: ${productData.products[num].name}</h3>`,
-            department = `<h3>Department: ${productData.products[num].name}</h3>`,
-            price = `<div class="block-years">Price ${productData.products[num].price}</div>`;
-
-            block += `${wrapper + title + department + price}</section>`;
-        return block;
-        
+let productDisplay = (json) => {
+    return new Promise(function (resolve, reject) {
+        let getItems = new XMLHttpRequest();
+        getItems.open('GET', json);
+        getItems.send();
+        getItems.addEventListener("load", (event) => {
+            let inventory = JSON.parse(event.target.responseText);
+            resolve(inventory);
+        });
+    });
 };
 
+let getKeys = (results) => {
+    let keys = Object.keys(results);
+    let data = results[keys];
+    return data;
+};
 
+function display(){
+    productDisplay('products.json')
+        .then((results) => {
+            return getKeys(results);
+        }).then((data) => {
+            data.forEach((item) => {
+                title = `<h3>Name: ${item.name}</h3>`;
+                price = `<p>Price: ${item.price}</p>`;
+                domDisplay.innerHTML += `${wrapper + title + price}`
 
+            });
+        });
 
-// XMLHttp requests, gets and sends
+        
+    productDisplay('categories.json')
+        .then((results) => {
+            return getKeys(results);
+        }).then((data) => {
+            data.forEach((item) => {
+                category = `<p>Category: ${item.name}</p>`
 
-let productDataRequest = new XMLHttpRequest(); // https://www.w3schools.com/xml/xml_http.asp
+                domDisplay.innerHTML += `${category}</section>`
 
-productDataRequest.addEventListener("load", dataComplete);
-productDataRequest.addEventListener("error", dataFailed);
+            });
+        });
+}
 
-productDataRequest.open("GET", "products.json"); //this just opens it up you're not going to get it until you send (line below)
-productDataRequest.send();
+function winterDiscounts() {
+    domDisplay.innerHTML = "";
+    if ()
 
-let categoriesDataRequest = new XMLHttpRequest(); // https://www.w3schools.com/xml/xml_http.asp
+}
 
-categoriesDataRequest.addEventListener("load", dataComplete);
-categoriesDataRequest.addEventListener("error", dataFailed);
+display();
 
-categoriesDataRequest.open("GET", "categories.json"); //this just opens it up you're not going to get it until you send (line below)
-categoriesDataRequest.send();
+winter.addEventListener("click", winterDiscounts);
 
